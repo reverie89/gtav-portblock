@@ -142,7 +142,7 @@ goto menuNone
 cls
 REM Create firewall rule for solo session
 netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=out action=block localport=6672
-REM netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672
+netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672
 echo.Firewall rule set. You are now in solo public session.
 goto menuSolo
 

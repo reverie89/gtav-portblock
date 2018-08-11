@@ -30,21 +30,19 @@ echo =========================================
 echo.
 echo 1) Start solo public session
 echo 2) Start whitelist session
-echo 5) How to use this?
-echo 7) About this program
+echo 5) How to use
+echo 7) About
 echo 0) Exit
-set m=noChoice
+set m=x
 set /p m=Enter option: 
-if %m%==noChoice (
-    cls
-    echo.Error: You need to select an option
-    goto menuNone
-)
 if %m%==1 goto startSolo
 if %m%==2 goto startWhitelist
 if %m%==5 goto howto
 if %m%==7 goto readme
 if %m%==0 goto quitScript
+cls
+echo.Error: Invalid option selected
+goto menuNone
 
 :menuSolo
 echo.
@@ -53,89 +51,83 @@ echo GTA V: Online private session by reverie
 echo =========================================
 echo.
 echo 1) Stop solo public session
-set m=noChoice
+set m=x
 set /p m=Enter option: 
-if %m%==noChoice (
-    cls
-    echo.Error: You need to select an option
-    goto menuSolo
-)
 if %m%==1 goto deleteFW
+cls
+echo.Error: Invalid option selected
+goto menuSolo
 
 :menuWhitelist
+set refreshWhitelist=0
 echo.
 echo =========================================
 echo GTA V: Online private session by reverie
 echo =========================================
 echo.
 echo 2) Stop whitelist session
-set m=noChoice
+echo 5) Refresh/View whitelist
+set m=x
 set /p m=Enter option: 
-if %m%==noChoice (
-    cls
-    echo.Error: You need to select an option
-    goto menuWhitelist
-)
 if %m%==2 goto deleteFW
+if %m%==5 (
+    set refreshWhitelist=1
+    goto startWhitelist
+)
+cls
+echo.Error: Invalid option selected
+goto menuWhitelist
 
 :howto
 cls
 echo.-----------------------------
 echo.How to play alone
 echo.-----------------------------
-echo.1. Go to GTA V: Online
+echo.1. Go to GTA V: Online.
 echo.2. After entering a public session, select "1) Start solo public session".
-echo.3. Wait for a few moments. Players should start leaving your session.
+echo.3. Wait for a few moments for players to leave the session. Find a new session if not.
 echo.4. ???
-echo.5. Profit!
+echo.5. Profit^^!
 echo.
 echo.-----------------------------
 echo.How to play with friends
 echo.-----------------------------
-echo.1. Ensure your friends' IP are put in a text file called "whitelist.txt" in the same
-echo.directory where this program is run. They can find their IP address through any third-
-echo.party services such as www.canihazip.com or even simply googling "what is my ip"
-echo.2. Follow steps in "Play alone"
-echo.3. Select "1) Stop solo public session" and then "2) Start whitelist session"
+echo.1. Ensure your friends' IP are put in a text file called "whitelist.txt" in the same directory where this program is run. They can find their IP address through any third-party services such as www.canihazip.com or even simply googling "what is my ip".
+echo.2. Follow steps in "Play alone".
+echo.3. Select "1) Stop solo public session" and then "2) Start whitelist session".
 echo.4. Invite your friends into your session via Steam overlay or Rockstar Social Club.
 echo.5. ???
-echo.6. Profit!
+echo.6. Profit^^!
 echo.
 echo.-----------------------------
 echo.How to remove firewall rules
 echo.-----------------------------
-echo.1. Select "Stop whitelist session" or "Stop solo public session"
+echo.1. Select "Stop whitelist session" or "Stop solo public session".
 echo.
-echo.Closed the program without selecting that first? The next time you run this they will
-echo.be deleted automatically.
+echo.Closed the program without selecting that first? The next time you run this they will be deleted automatically.
 echo.
 goto menuNone
 
 :readme
 cls
 echo.-----------------------------
-echo.About this program
+echo.About
 echo.-----------------------------
-echo.This tool uses *Windows Firewall* to set up port blocking and whitelisting so
-echo.you can have a fun experience playing GTA V: Online alone or with friends.
+echo.This tool uses *Windows Firewall* to set up port blocking and whitelisting so you can have a fun experience playing GTA V: Online alone or with your friends.
 echo.
-echo.This tool is not compatible if you are using a third-party firewall such as
-echo.ZoneAlarm or Comodo.
+echo.This tool is not compatible if you are using a third-party firewall such as ZoneAlarm or Comodo.
 echo.
-echo.This tool is useful if you want to play features such as CEO missions and Biker
-echo.businesses that can otherwise only be played if you are in a Public session but
-echo.wish to keep out griefers and/or modders who spoil your game.
+echo.This tool is useful if you want to play features such as CEO missions and Biker businesses that can otherwise only be played if you are in a Public session but wish to keep out griefers and/or modders whose sole intention are to ruin your game experience.
 echo.
-echo.This is a convenient tool written so that the user does not need any account
-echo.registration with a third-party website and keeps out the tedious configuration
-echo.of Windows Firewall rules.
+echo.This is a tool written for convenience:
+echo.1. You do not need account registration with a third-party website.
+echo.2. You do not need to bother with the tedious configuration of Windows Firewall rules.
 echo.
-echo.This tool does not touch any files related to the game. Instead it manipulates
-echo.your computer's connection to the network so you cannot connect to other players'
-echo.sessions. When you cannot connect to any network, the game places you into a
-echo.public session by yourself. This is also true if you have a terrible internet
-echo.connection. Unless Rockstar changes their terms of service, there is no reason
-echo.for your account to be flagged and banned.
+echo.This tool does not touch any files related to the game:
+echo.1. Instead it manipulates your computer's connection to the network so you cannot connect to other players' sessions.
+echo.2. When you cannot connect to any network (same as if you have a terrible internet connection), the game places you into a public session by yourself.
+echo.3. Unless Rockstar Games decides to change their terms of service, there is no reason for your account to be flagged and banned as a result of using this tool.
+echo.
 goto menuNone
 
 :startSolo
@@ -148,7 +140,7 @@ goto menuSolo
 
 :startWhitelist
 cls
-REM Check for file
+REM Check for whitelist.txt
 if not exist %InputFile% (
     echo.
     echo.
@@ -156,7 +148,12 @@ if not exist %InputFile% (
     goto menuNone
 )
 
-REM Refresh whitelist file
+if !refreshWhitelist!==1 (
+    echo.Refreshing whitelist session
+    netsh advfirewall firewall delete rule name=%fwRule%
+)
+
+REM Refresh whitelist.txt
 set TmpTmpFile=%Temp%\%~n0-tmp.tmp
 set TmpFile=%Temp%\%~n0.tmp
 (for /f "tokens=1-4 delims=. " %%a in ('type "%InputFile%"') do (
@@ -171,7 +168,7 @@ set TmpFile=%Temp%\%~n0.tmp
 ))>"%TmpFile%"
 del "%TmpTmpFile%"
 
-REM Show IP(s) in whitelist file
+REM Show IP(s) in whitelist.txt
 echo.======================== IP(s) in whitelist ============================
 set /a ColWidth = 3
 set /a ColCount = 0
@@ -252,7 +249,7 @@ del "%TmpFile%"
 REM Create firewall rule for whitelist session based on range to block
 netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=out action=block localport=6672 remoteip=!fullRange!
 REM netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672 remoteip=!fullRange!
-echo.Firewall rule set. Only players from the whitelist can join your session.
+echo.Firewall rule set. Only players from the whitelist can now join your session.
 goto menuWhitelist
 
 :quitScript

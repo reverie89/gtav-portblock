@@ -5,9 +5,26 @@ cls
 REM check for elevated privileges
 net session >nul 2>&1
 if not %errorLevel% == 0 (
-    echo Error: You must run this as administrator.
+    echo Error: You must run this as administrator
     pause
     exit /b
+)
+
+REM check if windows firewall is running
+sc query "MpsSvc" | find "RUNNING" >nul 2>&1
+echo sc "%errorLevel%"
+if "%errorLevel%" == "0" (
+  netsh advfirewall show currentprofile state | find "ON" >nul 2>&1
+  echo netsh "!errorLevel!"
+  if not "!errorLevel!" == "0" (
+    echo Error: You need to enable Windows Firewall
+    pause
+    exit /b
+  )
+) else (
+  echo Error: You need to start Windows Firewall service
+  pause
+  exit /b
 )
 
 set fwRule="Grand Theft Auto V by reverie"
@@ -16,10 +33,10 @@ set InputFile=%~dp0\whitelist.txt
 REM Remove firewall rule if set previously
 :deleteFW
 cls
-netsh advfirewall firewall show rule name=%fwRule% >nul
-if not ERRORLEVEL 1 (
+netsh advfirewall firewall show rule name=%fwRule% >nul 2>&1
+if not %errorLevel% == 1 (
     netsh advfirewall firewall delete rule name=%fwRule%
-    echo.Firewall rule deleted. The public can now join your session.
+    echo.Firewall rule deleted. The public can now join your sessio
 )
 
 :menuNone
@@ -113,7 +130,7 @@ cls
 echo.-----------------------------
 echo.About
 echo.-----------------------------
-echo.This tool uses *Windows Firewall* to set up port blocking and whitelisting so you can have a fun experience playing GTA V: Online alone or with your friends.
+echo.This tool uses *Windows Firewall* to set up port blocking and whitelisting so you can have a fun experience playing GTA V: Online alone or with your friends. You must enable it first if you want to use this tool.
 echo.
 echo.This tool is not compatible if you are using a third-party firewall such as ZoneAlarm or Comodo.
 echo.
@@ -135,7 +152,7 @@ cls
 REM Create firewall rule for solo session
 netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=out action=block localport=6672
 netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672
-echo.Firewall rule set. You are now in solo public session.
+echo.Firewall rules set. You are now in solo public session.
 goto menuSolo
 
 :startWhitelist
@@ -204,14 +221,14 @@ for /f "tokens=1" %%a in ('type "%TmpFile%"') do (
             REM modify prevset if last octet is actually 1
             if %%z==1 (
                 set /a octPrevC=!octPrevC!-1, octPrevD=!octPrevD!+255
-            )
-            REM modify prevset if third and last octet are actually 0 and 1 e.g. 192.168.0.1
-            if %%y==0 (
-                set /a octPrevB=!octPrevB!-1, octPrevC=!octPrevC!+256
-            )
-            REM modify prevset if all except first octet is 0 and last octet is 1 e.g. 192.0.0.1
-            if %%x==0 (
-                set /a octPrevA=!octPrevA!-1, octPrevB=!octPrevB!+256
+                REM modify prevset if third and last octet are actually 0 and 1 e.g. 192.168.0.1
+                if %%y==0 (
+                    set /a octPrevB=!octPrevB!-1, octPrevC=!octPrevC!+256
+                )
+                REM modify prevset if all except first octet is 0 and last octet is 1 e.g. 192.0.0.1
+                if %%x==0 (
+                    set /a octPrevA=!octPrevA!-1, octPrevB=!octPrevB!+256
+                )
             )
             set prevIP=!octPrevA!.!octPrevB!.!octPrevC!.!octPrevD!
         )
@@ -248,8 +265,8 @@ for /f "tokens=1" %%a in ('type "%TmpFile%"') do (
 del "%TmpFile%"
 REM Create firewall rule for whitelist session based on range to block
 netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=out action=block localport=6672 remoteip=!fullRange!
-REM netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672 remoteip=!fullRange!
-echo.Firewall rule set. Only players from the whitelist can now join your session.
+netsh advfirewall firewall add rule name=%fwRule% protocol=UDP dir=in action=block localport=6672 remoteip=!fullRange!
+echo.Firewall rules set. Only players from the whitelist can now join your session
 goto menuWhitelist
 
 :quitScript

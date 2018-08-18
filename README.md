@@ -1,7 +1,7 @@
 # gtav-portblock
 
 ## About this program
-This tool uses *Windows Firewall* to set up port blocking and whitelisting so you can have a fun experience playing GTA V: Online alone or with your friends.
+This tool uses *Windows Firewall* to set up port blocking and whitelisting so you can have a fun experience playing GTA V: Online alone or with your friends. You must enable it first if you want to use this tool.
 
 This tool is not compatible if you are using a third-party firewall such as ZoneAlarm or Comodo.
 

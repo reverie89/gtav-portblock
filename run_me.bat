@@ -36,7 +36,7 @@ cls
 netsh advfirewall firewall show rule name=%fwRule% >nul 2>&1
 if not %errorLevel% == 1 (
     netsh advfirewall firewall delete rule name=%fwRule%
-    echo.Firewall rule deleted. The public can now join your sessio
+    echo.Firewall rule deleted. The public can now join your session
 )
 
 :menuNone
